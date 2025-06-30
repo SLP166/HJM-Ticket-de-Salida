@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Solicitud de Ticket de Salida</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --azul: #004080;
+      --azul-oscuro: #002244;
+      --azul-claro: #f0f6ff;
+      --gris: #f9f9f9;
+      --borde: #004080;
+      --texto: #1a1a1a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background:
+        linear-gradient(rgba(240, 246, 255, 0.5), rgba(240, 246, 255, 0.5)),
+        url('https://hjmintl.com/web/assets/images/003.jpg') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .container {
+      background-color: rgba(255, 255, 255, 0.85);
+      padding: 35px 40px 25px;
+      border-radius: 20px;
+      max-width: 520px;
+      width: 100%;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.18);
+      border: 6px solid var(--azul-oscuro);
+      position: relative;
+      backdrop-filter: saturate(180%) blur(10px);
+      -webkit-backdrop-filter: saturate(180%) blur(10px);
+    }
+
+    .logo {
+      display: block;
+      margin: 0 auto 30px;
+      max-width: 160px;
+      padding: 16px;
+      border-radius: 20px;
+      background: linear-gradient(145deg, #e6f0ff, #c0d1ff);
+      box-shadow:
+        0 8px 20px rgba(0, 64, 128, 0.35),
+        inset 0 0 10px rgba(255, 255, 255, 0.8);
+      border: 2.5px solid #003366;
+      transition: transform 0.3s ease;
+    }
+
+    .logo:hover {
+      transform: scale(1.05);
+      box-shadow:
+        0 12px 30px rgba(0, 64, 128, 0.5),
+        inset 0 0 12px rgba(255, 255, 255, 0.9);
+    }
+
+    .titulo {
+      text-align: center;
+      font-size: 24px;
+      color: var(--azul);
+      margin: 0 0 30px 0;
+      font-weight: 700;
+      /* Quitar línea inferior eliminada */
+    }
+
+    label {
+      font-weight: 600;
+      margin: 12px 0 6px;
+      display: block;
+      color: var(--texto);
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      border: 1.5px solid #ccc;
+      border-radius: 10px;
+      background-color: #fff;
+      transition: border 0.2s;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--azul);
+      outline: none;
+    }
+
+    .checkbox-container {
+      margin-top: 18px;
+      display: flex;
+      align-items: center;
+    }
+
+    .checkbox-container input[type="checkbox"] {
+      margin-right: 10px;
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 16px;
+      font-size: 17px;
+      background-color: var(--azul);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 30px;
+      transition: background-color 0.3s;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+
+    button:hover {
+      background-color: #003366;
+    }
+
+    .firma {
+      text-align: center;
+      font-size: 12px;
+      color: #444;
+      margin-top: 30px;
+      opacity: 0.6;
+      user-select: none;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <img src="https://hjmintl.com/web/storage/configs/logo.png" alt="Logo HJM" class="logo">
+
+    <h2 class="titulo">Solicitud de Ticket de Salida</h2>
+
+    <label for="nombre">Nombre del colaborador</label>
+    <input id="nombre" type="text" required>
+
+    <label for="departamento">Departamento</label>
+    <input id="departamento" type="text" required>
+
+    <label for="motivo">Motivo de la salida</label>
+    <input id="motivo" type="text" required>
+
+    <label for="responsable">Responsable del Área</label>
+    <input id="responsable" type="text" required>
+
+    <div class="checkbox-container">
+      <input type="checkbox" id="chkVehiculo">
+      <label for="chkVehiculo" style="margin: 0;">Vehículo utilitario</label>
+    </div>
+    <input id="vehiculo" type="text" class="hidden" placeholder="Modelo del vehículo">
+
+    <button onclick="enviar()">Enviar solicitud</button>
+
+    <div class="firma">by Santos Lp</div>
+  </div>
+
+  <script>
+    const botToken = "7807712867:AAFbVxsUymjAT7sK3dFC_clA0rzc95KKUCw";
+    const grupoSolicitudes = "-1002847173269";
+
+    document.getElementById("chkVehiculo").addEventListener("change", function () {
+      const vehiculoInput = document.getElementById("vehiculo");
+      vehiculoInput.classList.toggle("hidden", !this.checked);
+      if (!this.checked) vehiculoInput.value = "";
+    });
+
+    async function enviar() {
+      const nombre = document.getElementById("nombre").value.trim();
+      const departamento = document.getElementById("departamento").value.trim();
+      const motivo = document.getElementById("motivo").value.trim();
+      const responsable = document.getElementById("responsable").value.trim();
+      const chkVehiculo = document.getElementById("chkVehiculo").checked;
+      const vehiculoValor = document.getElementById("vehiculo").value.trim();
+      const vehiculo = chkVehiculo ? vehiculoValor : "NO APLICA";
+
+      if (!nombre || !departamento || !motivo || !responsable) {
+        alert("Por favor completa todos los campos requeridos.");
+        return;
+      }
+
+      if (chkVehiculo && vehiculo === "") {
+        alert("Por favor indica el modelo del vehículo.");
+        return;
+      }
+
+      const fechaHora = new Date();
+      const fechaHoraStr = fechaHora.toLocaleString("es-MX", { hour12: false });
+      const folio = `HJM-${nombre.replace(/\s+/g, "").toUpperCase()}-${fechaHora.toISOString().replace(/[-:T]/g, "").slice(0, 14)}`;
+
+      const mensaje = `📢 SOLICITUD DE TICKET DE SALIDA\n\n` +
+                      `👤 Colaborador: ${nombre}\n` +
+                      `👤 Responsable: ${responsable}\n` +
+                      `🏢 Departamento: ${departamento}\n` +
+                      `🚗 Vehículo utilitario: ${vehiculo}\n` +
+                      `📝 Motivo: ${motivo}\n` +
+                      `⏰ Fecha/Hora: ${fechaHoraStr}\n` +
+                      `🔢 Folio: ${folio}\n\n`;
+
+      const botones = {
+        inline_keyboard: [[
+          { text: "Aprobar", callback_data: "APROBADO " + folio },
+          { text: "Rechazar", callback_data: "RECHAZADO " + folio }
+        ]]
+      };
+
+      const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+
+      try {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chat_id: grupoSolicitudes,
+            text: mensaje,
+            reply_markup: botones
+          })
+        });
+
+        if (response.ok) {
+          alert("Solicitud enviada con folio: " + folio);
+          document.querySelectorAll("input[type='text']").forEach(el => el.value = "");
+          document.getElementById("vehiculo").classList.add("hidden");
+          document.getElementById("chkVehiculo").checked = false;
+        } else {
+          alert("Error al enviar la solicitud.");
+        }
+      } catch (err) {
+        alert("Error de red: " + err.message);
+      }
+    }
+  </script>
+
+</body>
+</html>
