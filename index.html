@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -5,27 +6,12 @@
   <title>Solicitud de Ticket de Salida</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    :root {
-      --azul: #004080;
-      --azul-oscuro: #002244;
-      --azul-claro: #f0f6ff;
-      --gris: #f9f9f9;
-      --borde: #004080;
-      --texto: #1a1a1a;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
     body {
       margin: 0;
       padding: 20px;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background:
-        linear-gradient(rgba(240, 246, 255, 0.5), rgba(240, 246, 255, 0.5)),
-        url('https://hjmintl.com/web/assets/images/003.jpg') no-repeat center center fixed;
+      background: url('https://hjmintl.com/web/assets/images/003.jpg') no-repeat center center fixed;
       background-size: cover;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       display: flex;
       justify-content: center;
       align-items: flex-start;
@@ -33,81 +19,55 @@
     }
 
     .container {
-      background-color: rgba(255, 255, 255, 0.85);
-      padding: 35px 40px 25px;
+      background-color: rgba(255, 255, 255, 0.94);
+      padding: 30px 25px 15px;
       border-radius: 20px;
       max-width: 520px;
       width: 100%;
-      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.18);
-      border: 6px solid var(--azul-oscuro);
-      position: relative;
-      backdrop-filter: saturate(180%) blur(10px);
-      -webkit-backdrop-filter: saturate(180%) blur(10px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+      margin-top: 40px;
     }
 
     .logo {
       display: block;
-      margin: 0 auto 30px;
+      margin: 0 auto 25px;
       max-width: 160px;
-      padding: 16px;
-      border-radius: 20px;
-      background: linear-gradient(145deg, #e6f0ff, #c0d1ff);
-      box-shadow:
-        0 8px 20px rgba(0, 64, 128, 0.35),
-        inset 0 0 10px rgba(255, 255, 255, 0.8);
-      border: 2.5px solid #003366;
-      transition: transform 0.3s ease;
+      padding: 12px;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0, 64, 128, 0.4);
+      background-color: white;
     }
 
-    .logo:hover {
-      transform: scale(1.05);
-      box-shadow:
-        0 12px 30px rgba(0, 64, 128, 0.5),
-        inset 0 0 12px rgba(255, 255, 255, 0.9);
-    }
-
-    .titulo {
+    h2 {
       text-align: center;
-      font-size: 24px;
-      color: var(--azul);
-      margin: 0 0 30px 0;
-      font-weight: 700;
-      /* Quitar línea inferior eliminada */
+      font-size: 22px;
+      color: #004080;
+      margin-bottom: 25px;
     }
 
     label {
       font-weight: 600;
       margin: 12px 0 6px;
       display: block;
-      color: var(--texto);
     }
 
     input[type="text"] {
       width: 100%;
-      padding: 14px;
+      padding: 12px;
       font-size: 16px;
-      border: 1.5px solid #ccc;
-      border-radius: 10px;
-      background-color: #fff;
-      transition: border 0.2s;
-    }
-
-    input[type="text"]:focus {
-      border-color: var(--azul);
-      outline: none;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-bottom: 12px;
     }
 
     .checkbox-container {
-      margin-top: 18px;
+      margin-top: 10px;
       display: flex;
       align-items: center;
     }
 
-    .checkbox-container input[type="checkbox"] {
-      margin-right: 10px;
-      width: 18px;
-      height: 18px;
-      cursor: pointer;
+    .checkbox-container input {
+      margin-right: 8px;
     }
 
     .hidden {
@@ -116,17 +76,14 @@
 
     button {
       width: 100%;
-      padding: 16px;
-      font-size: 17px;
-      background-color: var(--azul);
+      padding: 14px;
+      font-size: 16px;
+      background-color: #004080;
       color: white;
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
+      margin-top: 20px;
       cursor: pointer;
-      margin-top: 30px;
-      transition: background-color 0.3s;
-      font-weight: 600;
-      letter-spacing: 0.03em;
     }
 
     button:hover {
@@ -136,11 +93,9 @@
     .firma {
       text-align: center;
       font-size: 12px;
-      color: #444;
-      margin-top: 30px;
+      color: #666;
+      margin-top: 20px;
       opacity: 0.6;
-      user-select: none;
-      font-style: italic;
     }
   </style>
 </head>
@@ -149,7 +104,7 @@
   <div class="container">
     <img src="https://hjmintl.com/web/storage/configs/logo.png" alt="Logo HJM" class="logo">
 
-    <h2 class="titulo">Solicitud de Ticket de Salida</h2>
+    <h2>Solicitud de Ticket de Salida</h2>
 
     <label for="nombre">Nombre del colaborador</label>
     <input id="nombre" type="text" required>
@@ -165,7 +120,7 @@
 
     <div class="checkbox-container">
       <input type="checkbox" id="chkVehiculo">
-      <label for="chkVehiculo" style="margin: 0;">Vehículo utilitario</label>
+      <label for="chkVehiculo">Vehículo utilitario</label>
     </div>
     <input id="vehiculo" type="text" class="hidden" placeholder="Modelo del vehículo">
 
@@ -174,14 +129,27 @@
     <div class="firma">by Santos Lp</div>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
   <script>
-    const botToken = "7807712867:AAFbVxsUymjAT7sK3dFC_clA0rzc95KKUCw";
-    const grupoSolicitudes = "-1002847173269";
+    let botToken = "";
+    let grupoSolicitudes = "";
+
+    // Clave secreta disfrazada
+    const claveSecretaDisfrazada = ["4rG", "xt_", "24()", "#pas", "stokenX2024"].join("");
+
+    fetch("tok.dat")
+      .then(res => res.text())
+      .then(text => {
+        const decrypted = CryptoJS.AES.decrypt(text.trim(), claveSecretaDisfrazada).toString(CryptoJS.enc.Utf8);
+        const partes = decrypted.split("|");
+        botToken = partes[0];
+        grupoSolicitudes = partes[1];
+      });
 
     document.getElementById("chkVehiculo").addEventListener("change", function () {
-      const vehiculoInput = document.getElementById("vehiculo");
-      vehiculoInput.classList.toggle("hidden", !this.checked);
-      if (!this.checked) vehiculoInput.value = "";
+      const inputVehiculo = document.getElementById("vehiculo");
+      inputVehiculo.classList.toggle("hidden", !this.checked);
+      if (!this.checked) inputVehiculo.value = "";
     });
 
     async function enviar() {
@@ -189,17 +157,12 @@
       const departamento = document.getElementById("departamento").value.trim();
       const motivo = document.getElementById("motivo").value.trim();
       const responsable = document.getElementById("responsable").value.trim();
-      const chkVehiculo = document.getElementById("chkVehiculo").checked;
-      const vehiculoValor = document.getElementById("vehiculo").value.trim();
-      const vehiculo = chkVehiculo ? vehiculoValor : "NO APLICA";
+      const vehiculo = document.getElementById("chkVehiculo").checked
+        ? document.getElementById("vehiculo").value.trim()
+        : "NO APLICA";
 
       if (!nombre || !departamento || !motivo || !responsable) {
-        alert("Por favor completa todos los campos requeridos.");
-        return;
-      }
-
-      if (chkVehiculo && vehiculo === "") {
-        alert("Por favor indica el modelo del vehículo.");
+        alert("Por favor completa todos los campos.");
         return;
       }
 
@@ -223,10 +186,8 @@
         ]]
       };
 
-      const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
-
       try {
-        const response = await fetch(url, {
+        const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -242,13 +203,12 @@
           document.getElementById("vehiculo").classList.add("hidden");
           document.getElementById("chkVehiculo").checked = false;
         } else {
-          alert("Error al enviar la solicitud.");
+          alert("Error al enviar.");
         }
       } catch (err) {
         alert("Error de red: " + err.message);
       }
     }
   </script>
-
 </body>
 </html>
