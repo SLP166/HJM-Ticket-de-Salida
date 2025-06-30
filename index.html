@@ -162,7 +162,6 @@
     let botToken = "";
     let grupoSolicitudes = "";
 
-    // Cargar credenciales automáticamente desde tok.dat en el mismo repo público
     fetch('tok.dat')
       .then(response => {
         if (!response.ok) throw new Error("Archivo tok.dat no encontrado");
@@ -186,7 +185,7 @@
 
     async function enviar() {
       if (!botToken || !grupoSolicitudes) {
-        alert("Las credenciales no están cargadas. Refresca la página o verifica tok.dat");
+        alert("verificar tok.dat");
         return;
       }
 
