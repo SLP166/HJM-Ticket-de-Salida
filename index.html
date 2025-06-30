@@ -153,31 +153,30 @@
     </div>
     <input id="vehiculo" type="text" class="hidden" placeholder="Modelo del vehículo">
 
-    <button onclick="enviar()">Enviar solicitud</button>
+    <button id="enviarBtn">Enviar solicitud</button>
 
     <div class="firma">by Santos Lp</div>
   </div>
 
   <script>
-    const base64Credenciales = "IHRva2VuOiAiNzgwNzcxMjg2NzpBQUZiVnhzVXltakFUN3NLM2RGQ19jbEEwcnpjOTVLS1VDdyIsCiAgY2hhdF9pZDogIi0xMDAyODQ3MTczMjY5Ig==";
+    let botToken = "";
+    let grupoSolicitudes = "";
 
-    function base64Decode(str) {
-      try {
-        return decodeURIComponent(atob(str).split('').map(function(c) {
-          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join(''));
-      } catch {
-        return atob(str);
-      }
-    }
-
-    let credenciales = {};
-    try {
-      credenciales = JSON.parse(base64Decode(base64Credenciales));
-    } catch (e) {
-      alert("Error cargando credenciales, revisa el base64.");
-      throw e;
-    }
+    // Cargar credenciales automáticamente desde tok.dat en el mismo repo público
+    fetch('tok.dat')
+      .then(response => {
+        if (!response.ok) throw new Error("Archivo tok.dat no encontrado");
+        return response.text();
+      })
+      .then(text => {
+        const jsonStr = atob(text.trim());
+        const creds = JSON.parse(jsonStr);
+        botToken = creds.botToken;
+        grupoSolicitudes = creds.chat_id || creds.chatId || creds.chat_id;
+      })
+      .catch(() => {
+        alert("No se pudo cargar el archivo tok.dat con credenciales.");
+      });
 
     document.getElementById("chkVehiculo").addEventListener("change", function () {
       const vehiculoInput = document.getElementById("vehiculo");
@@ -186,6 +185,11 @@
     });
 
     async function enviar() {
+      if (!botToken || !grupoSolicitudes) {
+        alert("Las credenciales no están cargadas. Refresca la página o verifica tok.dat");
+        return;
+      }
+
       const nombre = document.getElementById("nombre").value.trim();
       const departamento = document.getElementById("departamento").value.trim();
       const motivo = document.getElementById("motivo").value.trim();
@@ -224,14 +228,14 @@
         ]]
       };
 
-      const url = `https://api.telegram.org/bot${credenciales.botToken}/sendMessage`;
+      const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
 
       try {
         const response = await fetch(url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            chat_id: credenciales.chat_id,
+            chat_id: grupoSolicitudes,
             text: mensaje,
             reply_markup: botones
           })
@@ -249,6 +253,8 @@
         alert("Error de red: " + err.message);
       }
     }
+
+    document.getElementById("enviarBtn").addEventListener("click", enviar);
   </script>
 
 </body>
