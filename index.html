@@ -187,8 +187,15 @@
       }
 
       const fechaHora = new Date();
-      const fechaHoraStr = fechaHora.toLocaleString("es-MX", { hour12: false });
-      const folio = `HJM-${nombre.replace(/\s+/g, "").toUpperCase()}-${fechaHora.toISOString().replace(/[-:T]/g, "").slice(0, 14)}`;
+      const dd = String(fechaHora.getDate()).padStart(2, '0');
+      const mm = String(fechaHora.getMonth() + 1).padStart(2, '0');
+      const yyyy = fechaHora.getFullYear();
+      const hh = String(fechaHora.getHours()).padStart(2, '0');
+      const min = String(fechaHora.getMinutes()).padStart(2, '0');
+      const ss = String(fechaHora.getSeconds()).padStart(2, '0');
+
+      const fechaHoraStr = `${dd}/${mm}/${yyyy} ${hh}:${min}`;
+      const folio = `HJM-${nombre.replace(/\s+/g, "").toUpperCase()}-${yyyy}${mm}${dd}-${hh}${min}${ss}`;
 
       const mensaje = `📢 SOLICITUD DE TICKET DE SALIDA\n\n👤 Colaborador: ${nombre}\n👤 Responsable: ${responsable}\n🏢 Departamento: ${departamento}\n🚗 Vehículo utilitario: ${vehiculo}\n📝 Motivo: ${motivo}\n⏰ Fecha/Hora: ${fechaHoraStr}\n🔢 Folio: ${folio}\n`;
 
@@ -228,4 +235,5 @@
   </script>
 </body>
 </html>
+
 
