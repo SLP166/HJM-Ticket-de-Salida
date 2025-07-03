@@ -100,6 +100,30 @@
       max-height: 100px;
       opacity: 1;
     }
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .btn-opcion {
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1.5px solid var(--azul);
+      background-color: white;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--azul);
+      transition: all 0.2s;
+    }
+    .btn-opcion.active {
+      background-color: var(--azul);
+      color: white;
+    }
+    #otroDepartamentoBox, #otroMotivoBox {
+      display: none;
+    }
     button {
       width: 100%;
       padding: 16px;
@@ -137,13 +161,36 @@
     <img src="https://hjmintl.com/web/storage/configs/logo.png" alt="Logo HJM" class="logo">
     <h2 class="titulo">Solicitud de Ticket de Salida</h2>
     <label for="nombre">Nombre del colaborador</label>
-    <input id="nombre" type="text" required>
-    <label for="departamento">Departamento</label>
-    <input id="departamento" type="text" required>
+    <input id="nombre" type="text" required placeholder="Escriba el nombre completo con ambos apellidos">
+
+    <label>Departamento</label>
+    <div class="btn-group" id="grupoDeptos">
+      <div class="btn-opcion">Sistemas/MC</div>
+      <div class="btn-opcion">Seguridad Patrimonial/S&H</div>
+      <div class="btn-opcion">SDG</div>
+      <div class="btn-opcion">TH</div>
+      <div class="btn-opcion">Logística</div>
+      <div class="btn-opcion">Taller</div>
+      <div class="btn-opcion">Facturación</div>
+      <div class="btn-opcion">GyT</div>
+      <div class="btn-opcion">CEA</div>
+      <div class="btn-opcion">Servicio al Cliente</div>
+      <div class="btn-opcion">Operador</div>
+      <div class="btn-opcion" id="btnOtro">OTRO</div>
+    </div>
+    <input id="otroDepartamentoBox" type="text" placeholder="Especificar otro departamento">
+
     <label for="responsable">Responsable del Área</label>
-    <input id="responsable" type="text" required>
-    <label for="motivo">Motivo de la salida</label>
-    <input id="motivo" type="text" required>
+    <input id="responsable" type="text" required placeholder="Escriba el nombre completo con ambos apellidos">
+
+    <label>Motivo de la salida</label>
+    <div class="btn-group" id="grupoMotivos">
+      <div class="btn-opcion">Comida/Lonchera</div>
+      <div class="btn-opcion">Oxxo</div>
+      <div class="btn-opcion" id="btnOtroMotivo">OTROS</div>
+    </div>
+    <input id="otroMotivoBox" type="text" placeholder="Especificar otro motivo">
+
     <div class="checkbox-container">
       <input type="checkbox" id="chkVehiculo">
       <label for="chkVehiculo" style="margin: 0;">Vehículo utilitario</label>
@@ -168,6 +215,43 @@
       })
       .catch(() => alert("No se pudo cargar el archivo tok.dat."));
 
+    const opciones = document.querySelectorAll("#grupoDeptos .btn-opcion");
+    let departamentoSeleccionado = "";
+    opciones.forEach(btn => {
+      btn.addEventListener("click", () => {
+        opciones.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+
+        if (btn.id === "btnOtro") {
+          document.getElementById("otroDepartamentoBox").style.display = "block";
+          departamentoSeleccionado = "";
+        } else {
+          document.getElementById("otroDepartamentoBox").style.display = "none";
+          document.getElementById("otroDepartamentoBox").value = "";
+          departamentoSeleccionado = btn.textContent;
+        }
+      });
+    });
+
+    const btnsMotivos = document.querySelectorAll('#grupoMotivos .btn-opcion');
+    let motivoSeleccionado = "";
+
+    btnsMotivos.forEach(btn => {
+      btn.addEventListener("click", () => {
+        btnsMotivos.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+
+        if (btn.id === "btnOtroMotivo") {
+          document.getElementById("otroMotivoBox").style.display = "block";
+          motivoSeleccionado = "";
+        } else {
+          document.getElementById("otroMotivoBox").style.display = "none";
+          document.getElementById("otroMotivoBox").value = "";
+          motivoSeleccionado = btn.textContent;
+        }
+      });
+    });
+
     document.getElementById("chkVehiculo").addEventListener("change", function () {
       const vehiculoBox = document.getElementById("vehiculoBox");
       this.checked ? vehiculoBox.classList.add("show") : vehiculoBox.classList.remove("show");
@@ -175,11 +259,13 @@
 
     document.getElementById("enviarBtn").addEventListener("click", async () => {
       const nombre = document.getElementById("nombre").value.trim();
-      const departamento = document.getElementById("departamento").value.trim();
-      const motivo = document.getElementById("motivo").value.trim();
       const responsable = document.getElementById("responsable").value.trim();
       const chkVehiculo = document.getElementById("chkVehiculo").checked;
       const vehiculo = chkVehiculo ? document.getElementById("vehiculo").value.trim() : "NO APLICA";
+      const otroDepto = document.getElementById("otroDepartamentoBox").value.trim();
+      const departamento = departamentoSeleccionado || otroDepto;
+      const otroMotivo = document.getElementById("otroMotivoBox").value.trim();
+      const motivo = motivoSeleccionado || otroMotivo;
 
       if (!nombre || !departamento || !motivo || !responsable || (chkVehiculo && !vehiculo)) {
         alert("Por favor completa todos los campos requeridos.");
@@ -222,6 +308,12 @@
           document.querySelectorAll("input[type='text']").forEach(el => el.value = "");
           document.getElementById("vehiculoBox").classList.remove("show");
           document.getElementById("chkVehiculo").checked = false;
+          opciones.forEach(b => b.classList.remove("active"));
+          btnsMotivos.forEach(b => b.classList.remove("active"));
+          document.getElementById("otroDepartamentoBox").style.display = "none";
+          document.getElementById("otroMotivoBox").style.display = "none";
+          departamentoSeleccionado = "";
+          motivoSeleccionado = "";
         } else {
           alert("❌ Error al enviar la solicitud.");
         }
@@ -235,5 +327,7 @@
   </script>
 </body>
 </html>
+
+
 
 
