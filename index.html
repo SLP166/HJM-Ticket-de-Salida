@@ -121,6 +121,17 @@
       background-color: var(--azul);
       color: white;
     }
+    #btnOtro, #btnOtroMotivo {
+      background-color: #009688;
+      color: white;
+      border-color: #00796b;
+      font-weight: 700;
+    }
+    #btnOtro:hover, #btnOtroMotivo:hover {
+      background-color: #00796b;
+      border-color: #004d40;
+      color: white;
+    }
     #otroDepartamentoBox, #otroMotivoBox {
       display: none;
     }
@@ -160,8 +171,12 @@
   <div class="container">
     <img src="https://hjmintl.com/web/storage/configs/logo.png" alt="Logo HJM" class="logo">
     <h2 class="titulo">Solicitud de Ticket de Salida</h2>
+
     <label for="nombre">Nombre del colaborador</label>
-    <input id="nombre" type="text" required placeholder="Escriba el nombre completo con ambos apellidos">
+    <input id="nombre" type="text" required placeholder="Escriba el nombre y el primer apellido">
+
+    <label for="responsable">Responsable del Área</label>
+    <input id="responsable" type="text" required placeholder="Escriba el nombre y el primer apellido">
 
     <label>Departamento</label>
     <div class="btn-group" id="grupoDeptos">
@@ -176,18 +191,15 @@
       <div class="btn-opcion">CEA</div>
       <div class="btn-opcion">Servicio al Cliente</div>
       <div class="btn-opcion">Operador</div>
-      <div class="btn-opcion" id="btnOtro">OTRO</div>
+      <div class="btn-opcion" id="btnOtro">Otro departamento</div>
     </div>
     <input id="otroDepartamentoBox" type="text" placeholder="Especificar otro departamento">
-
-    <label for="responsable">Responsable del Área</label>
-    <input id="responsable" type="text" required placeholder="Escriba el nombre completo con ambos apellidos">
 
     <label>Motivo de la salida</label>
     <div class="btn-group" id="grupoMotivos">
       <div class="btn-opcion">Comida/Lonchera</div>
       <div class="btn-opcion">Oxxo</div>
-      <div class="btn-opcion" id="btnOtroMotivo">OTROS</div>
+      <div class="btn-opcion" id="btnOtroMotivo">Otro motivo</div>
     </div>
     <input id="otroMotivoBox" type="text" placeholder="Especificar otro motivo">
 
@@ -327,6 +339,7 @@
   </script>
 </body>
 </html>
+
 
 
 
