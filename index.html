@@ -62,7 +62,7 @@
     }
     label {
       font-weight: 600;
-      margin: 10px 0 6px;
+      margin: 12px 0 6px;
       display: block;
       color: var(--texto);
     }
@@ -156,7 +156,22 @@
     button:hover:not(:disabled) {
       background-color: #003366;
     }
-      </style>
+    .firma {
+      text-align: center;
+      font-size: 12px;
+      color: #444;
+      margin-top: 30px;
+      opacity: 0.6;
+      user-select: none;
+      font-style: italic;
+    }
+
+#nombre::placeholder,
+  #responsable::placeholder {
+    font-size: 10px; /* Puedes cambiar este número para hacerlo más pequeño o grande */
+  }
+
+  </style>
 </head>
 <body>
   <div class="container">
@@ -164,10 +179,10 @@
     <h2 class="titulo">Solicitud de Ticket de Salida</h2>
 
     <label for="nombre">Nombre del colaborador</label>
-    <input id="nombre" type="text" required placeholder="Escriba el nombre y el primer apellido">
+    <input id="nombre" type="text" required placeholder="Escriba el nombre completo con ambos apellidos">
 
     <label for="responsable">Responsable del Área</label>
-    <input id="responsable" type="text" required placeholder="Escriba el nombre y el primer apellido">
+    <input id="responsable" type="text" required placeholder="Escriba el nombre completo con ambos apellidos">
 
     <label>Departamento</label>
     <div class="btn-group" id="grupoDeptos">
@@ -330,8 +345,6 @@
   </script>
 </body>
 </html>
-
-
 
 
 
