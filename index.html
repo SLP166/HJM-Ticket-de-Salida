@@ -221,129 +221,124 @@
   </div>
 
   <script>
+    const nombreInput = document.getElementById("nombre");
+    const responsableInput = document.getElementById("responsable");
+    const grupoDeptos = document.getElementById("grupoDeptos");
+    const otroDeptoInput = document.getElementById("otroDepartamentoBox");
+    const grupoMotivos = document.getElementById("grupoMotivos");
+    const otroMotivoInput = document.getElementById("otroMotivoBox");
+    const chkVehiculo = document.getElementById("chkVehiculo");
+    const vehiculoBox = document.getElementById("vehiculoBox");
+    const vehiculoInput = document.getElementById("vehiculo");
+    const enviarBtn = document.getElementById("enviarBtn");
+
     let botToken = "";
     let grupoSolicitudes = "";
-
-    fetch('tok.dat')
-      .then(r => r.text())
-      .then(text => {
-        const data = JSON.parse(atob(text.trim()));
-        botToken = data.botToken;
-        grupoSolicitudes = data.chat_id;
-      })
-      .catch(() => alert("No se pudo cargar el archivo tok.dat."));
-
-    const opciones = document.querySelectorAll("#grupoDeptos .btn-opcion");
     let departamentoSeleccionado = "";
-    opciones.forEach(btn => {
-      btn.addEventListener("click", () => {
-        opciones.forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-
-        if (btn.id === "btnOtro") {
-          document.getElementById("otroDepartamentoBox").style.display = "block";
-          departamentoSeleccionado = "";
-        } else {
-          document.getElementById("otroDepartamentoBox").style.display = "none";
-          document.getElementById("otroDepartamentoBox").value = "";
-          departamentoSeleccionado = btn.textContent;
-        }
-      });
-    });
-
-    const btnsMotivos = document.querySelectorAll('#grupoMotivos .btn-opcion');
     let motivoSeleccionado = "";
 
-    btnsMotivos.forEach(btn => {
-      btn.addEventListener("click", () => {
-        btnsMotivos.forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
+    const backendUrl = 'https://slp166.pythonanywhere.com'; // URL de tu backend
+    
+    // El botToken ya no es necesario en el frontend, se maneja de forma segura en el backend.
+    // Solo necesitamos el ID del chat al que se enviarán las solicitudes.
+    grupoSolicitudes = "-1002847173269";
 
-        if (btn.id === "btnOtroMotivo") {
-          document.getElementById("otroMotivoBox").style.display = "block";
-          motivoSeleccionado = "";
-        } else {
-          document.getElementById("otroMotivoBox").style.display = "none";
-          document.getElementById("otroMotivoBox").value = "";
-          motivoSeleccionado = btn.textContent;
-        }
-      });
-    });
+    function handleOptionClick(event, group, otherInput, stateVarSetter) {
+      const btn = event.target.closest('.btn-opcion');
+      if (!btn) return;
 
-    document.getElementById("chkVehiculo").addEventListener("change", function () {
-      const vehiculoBox = document.getElementById("vehiculoBox");
+      group.querySelectorAll('.btn-opcion').forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      const isOther = btn.id.startsWith("btnOtro");
+      otherInput.style.display = isOther ? "block" : "none";
+      if (!isOther) otherInput.value = "";
+      
+      stateVarSetter(isOther ? "" : btn.textContent);
+    }
+
+    grupoDeptos.addEventListener("click", (e) => handleOptionClick(e, grupoDeptos, otroDeptoInput, (val) => departamentoSeleccionado = val));
+    grupoMotivos.addEventListener("click", (e) => handleOptionClick(e, grupoMotivos, otroMotivoInput, (val) => motivoSeleccionado = val));
+
+    chkVehiculo.addEventListener("change", function () {
       this.checked ? vehiculoBox.classList.add("show") : vehiculoBox.classList.remove("show");
     });
 
-    document.getElementById("enviarBtn").addEventListener("click", async () => {
-      const nombre = document.getElementById("nombre").value.trim();
-      const responsable = document.getElementById("responsable").value.trim();
-      const chkVehiculo = document.getElementById("chkVehiculo").checked;
-      const vehiculo = chkVehiculo ? document.getElementById("vehiculo").value.trim() : "NO APLICA";
-      const otroDepto = document.getElementById("otroDepartamentoBox").value.trim();
+    function resetForm() {
+      nombreInput.value = "";
+      responsableInput.value = "";
+      vehiculoInput.value = "";
+      otroDeptoInput.value = "";
+      otroMotivoInput.value = "";
+      chkVehiculo.checked = false;
+      vehiculoBox.classList.remove("show");
+      grupoDeptos.querySelectorAll('.btn-opcion').forEach(b => b.classList.remove("active"));
+      grupoMotivos.querySelectorAll('.btn-opcion').forEach(b => b.classList.remove("active"));
+      otroDeptoInput.style.display = "none";
+      otroMotivoInput.style.display = "none";
+      departamentoSeleccionado = "";
+      motivoSeleccionado = "";
+    }
+
+    enviarBtn.addEventListener("click", async () => {
+      const nombre = nombreInput.value.trim();
+      const responsable = responsableInput.value.trim();
+      const usaVehiculo = chkVehiculo.checked;
+      const vehiculo = usaVehiculo ? vehiculoInput.value.trim() : "NO APLICA";
+      const otroDepto = otroDeptoInput.value.trim();
       const departamento = departamentoSeleccionado || otroDepto;
-      const otroMotivo = document.getElementById("otroMotivoBox").value.trim();
+      const otroMotivo = otroMotivoInput.value.trim();
       const motivo = motivoSeleccionado || otroMotivo;
 
-      if (!nombre || !departamento || !motivo || !responsable || (chkVehiculo && !vehiculo)) {
+      if (!nombre || !departamento || !motivo || !responsable || (usaVehiculo && !vehiculo)) {
         alert("Por favor completa todos los campos requeridos.");
         return;
       }
 
       const fechaHora = new Date();
-      const dd = String(fechaHora.getDate()).padStart(2, '0');
-      const mm = String(fechaHora.getMonth() + 1).padStart(2, '0');
-      const yyyy = fechaHora.getFullYear();
-      const hh = String(fechaHora.getHours()).padStart(2, '0');
-      const min = String(fechaHora.getMinutes()).padStart(2, '0');
-      const ss = String(fechaHora.getSeconds()).padStart(2, '0');
-
-      const fechaHoraStr = `${dd}/${mm}/${yyyy} ${hh}:${min}`;
-      const folio = `HJM-${nombre.replace(/\s+/g, "").toUpperCase()}-${yyyy}${mm}${dd}-${hh}${min}${ss}`;
+      const fechaHoraStr = fechaHora.toLocaleString('es-MX', { dateStyle: 'short', timeStyle: 'short' });
+      const folioTimestamp = fechaHora.toISOString().replace(/[-:.]/g, "").slice(0, -4); // YYYYMMDDTHHMMSS
+      const folio = `HJM-${nombre.replace(/\s+/g, "").toUpperCase()}-${folioTimestamp}`;
 
       const mensaje = `📢 SOLICITUD DE TICKET DE SALIDA\n\n👤 Colaborador: ${nombre}\n👤 Responsable: ${responsable}\n🏢 Departamento: ${departamento}\n🚗 Vehículo utilitario: ${vehiculo}\n📝 Motivo: ${motivo}\n⏰ Fecha/Hora: ${fechaHoraStr}\n🔢 Folio: ${folio}\n`;
 
-      const botones = {
-        inline_keyboard: [[
-          { text: "Aprobar", callback_data: "APROBADO " + folio },
-          { text: "Rechazar", callback_data: "RECHAZADO " + folio }
-        ]]
+      enviarBtn.disabled = true;
+      enviarBtn.textContent = "Enviando...";
+
+      const manejarRespuesta = async (response) => {
+        const result = await response.json();
+        if (result.ok) {
+          alert("✅ Solicitud enviada con folio: " + folio);
+          resetForm();
+        } else {
+          console.error("Error desde el servidor/Telegram:", result);
+          throw new Error(result.description || 'Error desconocido desde la API.');
+        }
       };
 
-      const btn = document.getElementById("enviarBtn");
-      btn.disabled = true;
-      btn.textContent = "Enviando...";
+      // Se crea el payload para enviar al backend. No incluye el token.
+      const payload = { chat_id: grupoSolicitudes, text: mensaje, reply_markup: { inline_keyboard: [[{ text: "Aprobar", callback_data: "APROBADO " + folio }, { text: "Rechazar", callback_data: "RECHAZADO " + folio }]] } };
 
       try {
-        const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        // Llamada única y directa al backend.
+        const response = await fetch(`${backendUrl}/api/enviar_telegram`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ chat_id: grupoSolicitudes, text: mensaje, reply_markup: botones })
+          body: JSON.stringify(payload)
         });
-
-        if (response.ok) {
-          alert("✅ Solicitud enviada con folio: " + folio);
-          document.querySelectorAll("input[type='text']").forEach(el => el.value = "");
-          document.getElementById("vehiculoBox").classList.remove("show");
-          document.getElementById("chkVehiculo").checked = false;
-          opciones.forEach(b => b.classList.remove("active"));
-          btnsMotivos.forEach(b => b.classList.remove("active"));
-          document.getElementById("otroDepartamentoBox").style.display = "none";
-          document.getElementById("otroMotivoBox").style.display = "none";
-          departamentoSeleccionado = "";
-          motivoSeleccionado = "";
-        } else {
-          alert("❌ Error al enviar la solicitud.");
-        }
-      } catch (err) {
-        alert("🚫 Error de red: " + err.message);
-      } finally {
-        btn.disabled = false;
-        btn.textContent = "Enviar solicitud";
+        await manejarRespuesta(response);
+      } catch (error) {
+        console.error("Error al contactar el backend:", error.message);
+        alert(`🚫 Error de red. No se pudo contactar al servidor. Revisa la consola.`);
+      }
+      finally {
+        enviarBtn.disabled = false;
+        enviarBtn.textContent = "Enviar solicitud";
       }
     });
   </script>
 </body>
+</html>
 </html>
 
 
