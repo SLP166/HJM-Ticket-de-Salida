@@ -38,6 +38,28 @@
       position: relative;
       backdrop-filter: saturate(180%) blur(10px);
     }
+    .autocomplete-container {
+      position: relative;
+    }
+    .autocomplete-items {
+      position: absolute;
+      border: 1px solid #d4d4d4;
+      border-bottom: none;
+      border-top: none;
+      z-index: 99;
+      top: 100%;
+      left: 0;
+      right: 0;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .autocomplete-items div {
+      padding: 10px;
+      cursor: pointer;
+      background-color: #fff;
+      border-bottom: 1px solid #d4d4d4;
+    }
+    .autocomplete-items div:hover { background-color: #e9e9e9; }
     .logo {
       display: block;
       margin: 0 auto 30px;
@@ -150,6 +172,10 @@
       letter-spacing: 0.03em;
     }
     button:disabled {
+      background-color: #999;
+      cursor: not-allowed;
+    }
+    #enviarDirectoBtn {
       background-color: #777;
       cursor: not-allowed;
     }
@@ -178,11 +204,15 @@
     <img src="https://hjmintl.com/web/storage/configs/logo.png" alt="Logo HJM" class="logo">
     <h2 class="titulo">Solicitud de Ticket de Salida</h2>
 
-    <label for="nombre">Nombre del colaborador</label>
-    <input id="nombre" type="text" required placeholder="Escriba el nombre y un apellido">
+    <div class="autocomplete-container">
+      <label for="nombre">Nombre del colaborador</label>
+      <input id="nombre" type="text" required placeholder="Escriba o seleccione un nombre">
+    </div>
 
-    <label for="responsable">Responsable del Área</label>
-    <input id="responsable" type="text" required placeholder="Escriba el nombre y un apellido">
+    <div class="autocomplete-container">
+      <label for="responsable">Responsable del Área</label>
+      <input id="responsable" type="text" required placeholder="Escriba o seleccione un nombre">
+    </div>
 
     <label>Departamento</label>
     <div class="btn-group" id="grupoDeptos">
@@ -224,7 +254,7 @@
     let botToken = "";
     let grupoSolicitudes = "";
 
-    const backendUrl = 'https://slp166.pythonanywhere.com'; // URL de tu backend
+    const backendUrl = 'https://slp166.pythonanywhere.com';
 
     fetch(`${backendUrl}/tok.dat`)
       .then(r => r.text())
@@ -233,7 +263,69 @@
         botToken = data.botToken;
         grupoSolicitudes = data.chat_id;
       })
-      .catch((err) => alert("No se pudo cargar la configuración inicial desde el servidor. Error: " + err.message));
+      .catch((err) => {
+        console.error("No se pudo cargar la configuración inicial desde el servidor. Error: " + err.message);
+      });
+
+    let nombresEmpleados = [];
+    const sheetId = '1NE7c3oi8lIxLmIitiizU8QGPOJ_yWxuNH7-gcIFHc9k';
+    const sheetUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+
+    fetch(sheetUrl)
+      .then(res => res.text())
+      .then(text => {
+        const json = JSON.parse(text.substring(47).slice(0, -2));
+        nombresEmpleados = json.table.rows
+          .slice(1)
+          .map(row => (row.c[2] && row.c[2].v) ? row.c[2].v.trim() : null)
+          .filter(name => name);
+        console.log("Nombres cargados:", nombresEmpleados);
+      })
+      .catch(err => console.error("Error al cargar nombres del Google Sheet:", err));
+
+    function setupAutocomplete(inputElement) {
+      let currentFocus;
+      inputElement.addEventListener("input", function(e) {
+        let list, item, val = this.value;
+        closeAllLists();
+        if (!val) { return false; }
+        currentFocus = -1;
+        list = document.createElement("DIV");
+        list.setAttribute("id", this.id + "autocomplete-list");
+        list.setAttribute("class", "autocomplete-items");
+        this.parentNode.appendChild(list);
+
+        nombresEmpleados.forEach(nombre => {
+          if (nombre.toUpperCase().includes(val.toUpperCase())) {
+            item = document.createElement("DIV");
+            item.innerHTML = "<strong>" + nombre.substr(0, val.length) + "</strong>";
+            item.innerHTML += nombre.substr(val.length);
+            item.innerHTML += "<input type='hidden' value='" + nombre + "'>";
+            item.addEventListener("click", function(e) {
+              inputElement.value = this.getElementsByTagName("input")[0].value;
+              closeAllLists();
+            });
+            list.appendChild(item);
+          }
+        });
+      });
+
+      function closeAllLists(elmnt) {
+        const items = document.getElementsByClassName("autocomplete-items");
+        for (let i = 0; i < items.length; i++) {
+          if (elmnt != items[i] && elmnt != inputElement) {
+            items[i].parentNode.removeChild(items[i]);
+          }
+        }
+      }
+
+      document.addEventListener("click", function (e) {
+        closeAllLists(e.target);
+      });
+    }
+
+    setupAutocomplete(document.getElementById("nombre"));
+    setupAutocomplete(document.getElementById("responsable"));
 
     const opciones = document.querySelectorAll("#grupoDeptos .btn-opcion");
     let departamentoSeleccionado = "";
@@ -299,7 +391,7 @@
       const hh = String(fechaHora.getHours()).padStart(2, '0');
       const min = String(fechaHora.getMinutes()).padStart(2, '0');
       const ss = String(fechaHora.getSeconds()).padStart(2, '0');
-
+      
       const fechaHoraStr = `${dd}/${mm}/${yyyy} ${hh}:${min}`;
       const folio = `HJM-${nombre.replace(/\s+/g, "").toUpperCase()}-${yyyy}${mm}${dd}-${hh}${min}${ss}`;
 
@@ -309,33 +401,44 @@
       btn.disabled = true;
       btn.textContent = "Enviando...";
 
+      const payload = { 
+        chat_id: grupoSolicitudes, 
+        text: mensaje, 
+        reply_markup: { inline_keyboard: [[{ text: "Aprobar", callback_data: "APROBADO " + folio }, { text: "Rechazar", callback_data: "RECHAZADO " + folio }]] } 
+      };
+
       try {
         const response = await fetch(`${backendUrl}/api/enviar_telegram`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ 
-            chat_id: grupoSolicitudes, 
-            text: mensaje, 
-            reply_markup: { inline_keyboard: [[{ text: "Aprobar", callback_data: "APROBADO " + folio }, { text: "Rechazar", callback_data: "RECHAZADO " + folio }]] } 
-          })
+          body: JSON.stringify(payload)
         });
 
-        if (response.ok) {
-          alert("✅ Solicitud enviada con folio: " + folio);
-          document.querySelectorAll("input[type='text']").forEach(el => el.value = "");
-          document.getElementById("vehiculoBox").classList.remove("show");
-          document.getElementById("chkVehiculo").checked = false;
-          opciones.forEach(b => b.classList.remove("active"));
-          btnsMotivos.forEach(b => b.classList.remove("active"));
-          document.getElementById("otroDepartamentoBox").style.display = "none";
-          document.getElementById("otroMotivoBox").style.display = "none";
-          departamentoSeleccionado = "";
-          motivoSeleccionado = "";
-        } else {
-          alert("❌ Error al enviar la solicitud.");
+        if (!response.ok) {
+          throw new Error(`Error del servidor: ${response.statusText}`);
         }
-      } catch (err) {
-        alert("🚫 Error de red: " + err.message);
+
+        alert("✅ Solicitud enviada con folio: " + folio);
+
+      } catch (pythonError) {
+        console.warn("Fallo al enviar con el backend de Python:", pythonError.message);
+        
+        try {
+          const phpProxyUrl = 'http://hjmintl.com/telegram_proxy.php';
+          const fallbackResponse = await fetch(phpProxyUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+
+          if (!fallbackResponse.ok) throw new Error('El método de respaldo también falló.');
+
+          alert("✅ Solicitud enviada con folio (vía respaldo): " + folio);
+
+        } catch (phpError) {
+          console.error("Fallo al enviar con el proxy PHP:", phpError.message);
+          alert("🚫 Error: Ambos métodos de envío fallaron. Por favor, revisa tu conexión o contacta al administrador.");
+        }
       } finally {
         btn.disabled = false;
         btn.textContent = "Enviar solicitud";
