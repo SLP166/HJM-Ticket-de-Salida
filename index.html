@@ -206,12 +206,12 @@
 
     <div class="autocomplete-container">
       <label for="nombre">Nombre del colaborador</label>
-      <input id="nombre" type="text" required placeholder="Escriba o seleccione un nombre">
+      <input id="nombre" type="text" required placeholder="Escriba o seleccione un nombre" autocomplete="off">
     </div>
 
     <div class="autocomplete-container">
       <label for="responsable">Responsable del Área</label>
-      <input id="responsable" type="text" required placeholder="Escriba o seleccione un nombre">
+      <input id="responsable" type="text" required placeholder="Escriba o seleccione un nombre" autocomplete="off">
     </div>
 
     <label>Departamento</label>
@@ -324,6 +324,21 @@
       });
     }
 
+    function resetForm() {
+      document.getElementById('nombre').value = '';
+      document.getElementById('responsable').value = '';
+      document.getElementById('otroDepartamentoBox').value = '';
+      document.getElementById('otroMotivoBox').value = '';
+      document.getElementById('vehiculo').value = '';
+      
+      document.querySelectorAll('.btn-opcion.active').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('otroDepartamentoBox').style.display = 'none';
+      document.getElementById('otroMotivoBox').style.display = 'none';
+      
+      document.getElementById('chkVehiculo').checked = false;
+      document.getElementById('vehiculoBox').classList.remove('show');
+    }
+
     setupAutocomplete(document.getElementById("nombre"));
     setupAutocomplete(document.getElementById("responsable"));
 
@@ -419,6 +434,7 @@
         }
 
         alert("✅ Solicitud enviada con folio: " + folio);
+        resetForm();
 
       } catch (pythonError) {
         console.warn("Fallo al enviar con el backend de Python:", pythonError.message);
@@ -434,6 +450,7 @@
           if (!fallbackResponse.ok) throw new Error('El método de respaldo también falló.');
 
           alert("✅ Solicitud enviada con folio (vía respaldo): " + folio);
+          resetForm();
 
         } catch (phpError) {
           console.error("Fallo al enviar con el proxy PHP:", phpError.message);
