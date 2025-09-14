@@ -410,7 +410,7 @@
       const fechaHoraStr = `${dd}/${mm}/${yyyy} ${hh}:${min}`;
       const folio = `HJM-${nombre.replace(/\s+/g, "").toUpperCase()}-${yyyy}${mm}${dd}-${hh}${min}${ss}`;
 
-      const mensaje = `🎫 SOLICITUD DE TICKET DE SALIDA\n━━━━━━━━━━━━━━━━━━━━━━━━━\n👤 Colaborador: ${nombre}\n👤 Responsable: ${responsable}\n🏢 Departamento: ${departamento}\n🚗 Vehículo utilitario: ${vehiculo}\n📝 Motivo: ${motivo}\n⏰ Fecha/Hora: ${fechaHoraStr}\n🔢 Folio: ${folio}\n━━━━━━━━━━━━━━━━━━━━━━━━━\n📍 Sistema de Tickets HJM`;
+      const mensaje = `🎫 SOLICITUD DE TICKET DE SALIDA\n━━━━━━━━━━━━━━━━━━━\n👤 Colaborador: ${nombre}\n👤 Responsable: ${responsable}\n🏢 Departamento: ${departamento}\n🚗 Vehículo utilitario: ${vehiculo}\n📝 Motivo: ${motivo}\n⏰ Fecha/Hora: ${fechaHoraStr}\n🔢 Folio: ${folio}\n━━━━━━━━━━━━━━━━━━━\n📍 Sistema de Tickets HJM`;
 
       const btn = document.getElementById("enviarBtn");
       btn.disabled = true;
