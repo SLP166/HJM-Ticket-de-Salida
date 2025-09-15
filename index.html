@@ -5,6 +5,7 @@
   <title>Solicitud de Ticket de Salida</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     :root {
       --azul: #004080;
@@ -100,6 +101,9 @@
     input[type="text"]:focus {
       border-color: var(--azul);
       outline: none;
+    }
+    input.error {
+      border-color: #c0392b !important;
     }
     .checkbox-container {
       margin-top: 18px;
@@ -339,6 +343,24 @@
       document.getElementById('vehiculoBox').classList.remove('show');
     }
 
+    function mostrarNotificacion(titulo, texto, tipo) {
+      if (tipo === 'exito') {
+        Swal.fire({
+          icon: 'success',
+          title: titulo,
+          text: texto,
+          confirmButtonColor: '#004080'
+        });
+      } else { // error
+        Swal.fire({
+          icon: 'error',
+          title: titulo,
+          text: texto,
+          confirmButtonColor: '#004080'
+        });
+      }
+    }
+
     setupAutocomplete(document.getElementById("nombre"));
     setupAutocomplete(document.getElementById("responsable"));
 
@@ -394,8 +416,37 @@
       const otroMotivo = document.getElementById("otroMotivoBox").value.trim();
       const motivo = motivoSeleccionado || otroMotivo;
 
-      if (!nombre || !departamento || !motivo || !responsable || (chkVehiculo && !vehiculo)) {
-        alert("Por favor completa todos los campos requeridos.");
+      let esValido = true;
+      document.querySelectorAll('input.error').forEach(el => el.classList.remove('error'));
+
+      const campos = [
+        { el: document.getElementById('nombre'), val: nombre },
+        { el: document.getElementById('responsable'), val: responsable },
+        { el: document.getElementById('otroDepartamentoBox'), val: departamento },
+        { el: document.getElementById('otroMotivoBox'), val: motivo },
+      ];
+      if (chkVehiculo) campos.push({ el: document.getElementById('vehiculo'), val: vehiculo });
+
+      campos.forEach(campo => {
+        if (!campo.val) { campo.el.classList.add('error'); esValido = false; }
+      });
+
+      if (!nombresEmpleados.includes(nombre) && !nombre.toUpperCase().startsWith('HJM ')) {
+        document.getElementById('nombre').classList.add('error');
+        esValido = false;
+        mostrarNotificacion('Error de Validación', 'El nombre del colaborador no es válido. Por favor, selecciónalo de la lista.', 'error');
+        return;
+      }
+
+      if (!nombresEmpleados.includes(responsable) && !responsable.toUpperCase().startsWith('HJM ')) {
+        document.getElementById('responsable').classList.add('error');
+        esValido = false;
+        mostrarNotificacion('Error de Validación', 'El nombre del responsable no es válido. Por favor, selecciónalo de la lista.', 'error');
+        return;
+      }
+
+      if (!esValido) {
+        mostrarNotificacion('Campos Incompletos', 'Por favor, completa los campos resaltados en rojo.', 'error');
         return;
       }
 
@@ -433,7 +484,7 @@
           throw new Error(`Error del servidor: ${response.statusText}`);
         }
 
-        alert("✅ Solicitud enviada con folio: " + folio);
+        mostrarNotificacion('¡Solicitud Enviada!', 'Tu solicitud con folio ' + folio + ' ha sido enviada correctamente.', 'exito');
         resetForm();
 
       } catch (pythonError) {
@@ -449,12 +500,12 @@
 
           if (!fallbackResponse.ok) throw new Error('El método de respaldo también falló.');
 
-          alert("✅ Solicitud enviada con folio (vía respaldo): " + folio);
+          mostrarNotificacion('¡Solicitud Enviada!', 'Tu solicitud con folio ' + folio + ' ha sido enviada por el sistema de respaldo.', 'exito');
           resetForm();
 
         } catch (phpError) {
           console.error("Fallo al enviar con el proxy PHP:", phpError.message);
-          alert("🚫 Error: Ambos métodos de envío fallaron. Por favor, revisa tu conexión o contacta al administrador.");
+          mostrarNotificacion('Error Crítico', 'Ambos métodos de envío fallaron. Por favor, revisa tu conexión o contacta al administrador.', 'error');
         }
       } finally {
         btn.disabled = false;
@@ -464,6 +515,4 @@
   </script>
 </body>
 </html>
-
-
 
