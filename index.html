@@ -210,12 +210,12 @@
 
     <div class="autocomplete-container">
       <label for="nombre">Nombre del colaborador</label>
-      <input id="nombre" type="text" required placeholder="Escriba o seleccione un nombre" autocomplete="off">
+      <input id="nombre" type="text" required placeholder="Buscar por nombre..." autocomplete="off">
     </div>
 
     <div class="autocomplete-container">
       <label for="responsable">Responsable del Área</label>
-      <input id="responsable" type="text" required placeholder="Escriba o seleccione un nombre" autocomplete="off">
+      <input id="responsable" type="text" required placeholder="Buscar por nombre..." autocomplete="off">
     </div>
 
     <label>Departamento</label>
@@ -299,18 +299,32 @@
         list.setAttribute("class", "autocomplete-items");
         this.parentNode.appendChild(list);
 
+        const normalizeText = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+        const searchTerm = normalizeText(val);
+
+        const startsWith = [];
+        const includes = [];
+
         nombresEmpleados.forEach(nombre => {
-          if (nombre.toUpperCase().includes(val.toUpperCase())) {
+          const normalizedName = normalizeText(nombre);
+          if (normalizedName.startsWith(searchTerm)) {
+            startsWith.push(nombre);
+          } else if (normalizedName.includes(searchTerm)) {
+            includes.push(nombre);
+          }
+        });
+
+        [...startsWith, ...includes].slice(0, 10).forEach(nombre => { 
             item = document.createElement("DIV");
-            item.innerHTML = "<strong>" + nombre.substr(0, val.length) + "</strong>";
-            item.innerHTML += nombre.substr(val.length);
+            const matchIndex = normalizeText(nombre).indexOf(searchTerm);
+            item.innerHTML = nombre.substr(0, matchIndex) + "<strong>" + nombre.substr(matchIndex, val.length) + "</strong>" + nombre.substr(matchIndex + val.length);
+
             item.innerHTML += "<input type='hidden' value='" + nombre + "'>";
             item.addEventListener("click", function(e) {
               inputElement.value = this.getElementsByTagName("input")[0].value;
               closeAllLists();
             });
             list.appendChild(item);
-          }
         });
       });
 
@@ -515,4 +529,3 @@
   </script>
 </body>
 </html>
-
